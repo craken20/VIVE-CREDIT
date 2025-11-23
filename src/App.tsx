@@ -9,6 +9,7 @@ function App() {
 
   return (
     <div>
+      {showHeader && <header>Welcome to the Home Page</header>}
       <AppRoutes />
       <ScoringPage />
     </div>
