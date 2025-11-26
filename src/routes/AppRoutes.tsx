@@ -1,4 +1,5 @@
 import DashboardPage from "@/modules/dashboard/pages/DashboardPage";
+import { AuditDashboard } from "@/modules/admin-audit/AuditDashboard";
 import DocumentsPage from "@/modules/dashboard/pages/DocumentsPage";
 import LoanPage from "@/modules/dashboard/pages/LoanPage";
 import PaymentsPage from "@/modules/dashboard/pages/PaymentsPage";
@@ -9,6 +10,7 @@ import OperatorDashboardLayout from "@/modules/operator-dashboard/layout/Operato
 import OperatorDashboardPage from "@/modules/operator-dashboard/pages/OperatorDasboardPage";
 import RiskPage from "@/modules/operator-dashboard/pages/RiskPage";
 import { Route, Routes, Navigate } from "react-router-dom";
+import LoanForm from "@/pages/loan/LoanForm";
 
 const AppRoutes = () => {
   return (
@@ -25,6 +27,7 @@ const AppRoutes = () => {
       <Route path="/dashboard/loan" element={<LoanPage />} />
       <Route path="/dashboard/payments" element={<PaymentsPage />} />
       <Route path="/dashboard/documents" element={<DocumentsPage />} />
+      <Route path="/dashboard/loan-form" element={<LoanForm />} />
       
       {/* OPERATOR DASHBOARD SALES/RISK/COLLECTIONS */}
       <Route path="/operator" element={<OperatorDashboardLayout />}>
@@ -36,6 +39,7 @@ const AppRoutes = () => {
       
       {/* Policy Engine */}
       <Route path="/policy-engine" element={<PolicyEnginePage />} />
+      <Route path="/audit" element={<AuditDashboard />} />
       
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

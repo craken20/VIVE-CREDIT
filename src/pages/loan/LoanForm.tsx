@@ -101,7 +101,7 @@ export default function LoanForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-6">
-      <main className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full overflow-hidden shadow-sm border border-blue-100">
+      <main className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full overflow-hidden border border-blue-100">
         <Header />
         <DemoBanner />
 
