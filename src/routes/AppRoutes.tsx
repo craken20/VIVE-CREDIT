@@ -15,6 +15,8 @@ import DecisionPage from '@/modules/decision-engine/Pages/DecisionPage';
 import { ScorecardEngine } from '@/modules/scoring/pages/ScorecardEngine';
 import SalesDashboard from '@/modules/operator-dashboard/submodules/sales/SalesDashboard';
 import ApplicationDetail from '@/modules/operator-dashboard/submodules/sales/ApplicationDetail';
+import CollectionsDashboard from "@/modules/operator-dashboard/submodules/collections/CollectionsDashboard";
+import PTPManagement from "@/modules/operator-dashboard/submodules/collections/PTPManagement";
 
 
 const AppRoutes = () => {
@@ -34,13 +36,16 @@ const AppRoutes = () => {
       <Route path="/dashboard/documents" element={<DocumentsPage />} />
       <Route path="/dashboard/loan-form" element={<LoanForm />} />
 
+  
      
       {/* OPERATOR DASHBOARD SALES/RISK/COLLECTIONS */}
-<Route path="/operator" element={<OperatorDashboardLayout />}>
+<Route path="/operator-dashboard" element={<OperatorDashboardLayout />}>
   <Route index element={<OperatorDashboardPage />} />
   <Route path="risk" element={<RiskPage />} />
   <Route path="sales" element={<SalesDashboard />} />
   <Route path="sales/:id" element={<ApplicationDetail />} />
+  <Route path="collections" element={<CollectionsDashboard />} />
+  <Route path="collections/ptp" element={<PTPManagement />} />
 </Route>
 
 
