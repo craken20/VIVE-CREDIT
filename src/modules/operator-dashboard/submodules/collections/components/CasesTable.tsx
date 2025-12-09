@@ -3,9 +3,10 @@ import type { CollectionCase } from "../types";
 
 interface Props {
   data: CollectionCase[];
+  onView: (row: CollectionCase) => void;
 }
 
-export default function CasesTable({ data }: Props) {
+export default function CasesTable({ data ,onView}: Props) {
   return (
     <table className="w-full border-collapse">
       <thead>
@@ -37,9 +38,13 @@ export default function CasesTable({ data }: Props) {
             <td className="p-3">{row.agent ?? "N/A"}</td>
 
             <td className="p-3">
-              <button className="bg-blue-600 text-white px-3 py-1 rounded mr-2">
+              <button
+              onClick={() => onView(row)}
+               className="bg-blue-600 text-white px-3 py-1 rounded mr-2">
+                
                 View
               </button>
+            
               <button className="bg-gray-700 text-white px-3 py-1 rounded">
                 Docs
               </button>
