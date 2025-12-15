@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   Home,
   FileText,
@@ -14,22 +14,48 @@ import {
 import { NavLink } from "react-router-dom";
 import { useTheme } from "@/context/ThemeContext";
 import UserBadge from "@/components/UserBadge";
+import NotificationBell from "@/components/notifications/NotificationBell";
+import Toast from "@/components/notifications/Toast";
+import type { Notification } from "@/components/notifications/notifications.types";
+
+const EVENT_NAME = "notifications-updated";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
+  const [toast, setToast] = useState<Notification | null>(null);
   const { theme, toggleTheme } = useTheme();
 
   const linkClasses =
     "flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium";
 
+  useEffect(() => {
+    const handleNewNotification = (e: Event) => {
+      const customEvent = e as CustomEvent<Notification>;
+      setToast(customEvent.detail);
+    };
+
+    window.addEventListener(EVENT_NAME, handleNewNotification);
+    return () => window.removeEventListener(EVENT_NAME, handleNewNotification);
+  }, []);
+
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+      {toast && (
+        <Toast
+          message={toast.text}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
       <div className="md:hidden fixed top-0 left-0 w-full bg-white dark:bg-gray-800 shadow-sm z-30 p-4 flex items-center justify-between">
         <h2 className="text-xl font-bold text-blue-600 dark:text-blue-400">
           VIVE CREDIT
         </h2>
 
         <div className="flex items-center gap-3">
+          <NotificationBell />
+
           <button
             onClick={toggleTheme}
             className="p-2 rounded-full bg-gray-100 dark:bg-gray-700"
@@ -57,9 +83,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <aside
         className={`
           fixed md:relative z-50 top-0 left-0 w-64 h-screen
-          bg-white dark:bg-gray-800 
-          border-r border-gray-200 dark:border-gray-700 
-          p-6 flex flex-col 
+          bg-white dark:bg-gray-800
+          border-r border-gray-200 dark:border-gray-700
+          p-6 flex flex-col
           transition-transform duration-300
           ${open ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
@@ -77,16 +103,20 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             VIVE CREDIT
           </h2>
 
-          <button
-            onClick={toggleTheme}
-            className="p-3 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition shadow-sm"
-          >
-            {theme === "light" ? (
-              <Sun size={20} className="text-blue-500" />
-            ) : (
-              <Moon size={20} className="text-blue-300" />
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+
+            <button
+              onClick={toggleTheme}
+              className="p-3 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition shadow-sm"
+            >
+              {theme === "light" ? (
+                <Sun size={20} className="text-blue-500" />
+              ) : (
+                <Moon size={20} className="text-blue-300" />
+              )}
+            </button>
+          </div>
         </div>
 
         <nav className="space-y-2 flex-1 overflow-y-auto pb-20">

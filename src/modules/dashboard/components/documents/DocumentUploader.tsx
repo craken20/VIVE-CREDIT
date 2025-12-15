@@ -10,6 +10,7 @@ import {
   X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { addNotification } from "@/components/notifications/notifications.actions";
 
 export default function DocumentUploader() {
   const navigate = useNavigate();
@@ -85,11 +86,18 @@ export default function DocumentUploader() {
   };
 
   const handleSubmit = () => {
+    addNotification({
+      text: `Au fost trimise ${files.length} document(e) pentru verificare`,
+      date: new Date().toISOString(),
+      read: false,
+      type: "document",
+    });
+
     setSentMessage("Documentele au fost trimise cu succes! 🔥");
 
     setTimeout(() => {
       navigate("/dashboard/documents");
-    }, 1500);
+    }, 3500);
 
     setFiles([]);
   };
@@ -202,11 +210,7 @@ export default function DocumentUploader() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setPreviewFile(file)}
-                    className="
-                      p-2 rounded-md 
-                      hover:bg-blue-100 dark:hover:bg-blue-900/40 
-                      transition
-                    "
+                    className="p-2 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/40 transition"
                   >
                     <Eye
                       size={18}
@@ -216,11 +220,7 @@ export default function DocumentUploader() {
 
                   <button
                     onClick={() => removeFile(i)}
-                    className="
-                      p-2 rounded-md 
-                      hover:bg-red-100 dark:hover:bg-red-900/40 
-                      transition
-                    "
+                    className="p-2 rounded-md hover:bg-red-100 dark:hover:bg-red-900/40 transition"
                   >
                     <Trash2
                       size={18}
@@ -236,11 +236,7 @@ export default function DocumentUploader() {
 
       {files.length > 0 && (
         <button
-          className="
-            w-full py-3 mt-2 rounded-lg font-semibold
-            bg-blue-600 hover:bg-blue-700 
-            text-white shadow-md transition
-          "
+          className="w-full py-3 mt-2 rounded-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-md transition"
           onClick={handleSubmit}
         >
           Trimite documentele
@@ -256,16 +252,11 @@ export default function DocumentUploader() {
 
       {previewFile && (
         <div
-          className="
-            fixed inset-0 bg-black/60 flex items-center justify-center z-50
-            p-4
-          "
+          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
           onClick={() => setPreviewFile(null)}
         >
           <div
-            className="
-              bg-white dark:bg-[#1C2534] rounded-xl p-5 shadow-xl max-w-3xl w-full
-            "
+            className="bg-white dark:bg-[#1C2534] rounded-xl p-5 shadow-xl max-w-3xl w-full"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
