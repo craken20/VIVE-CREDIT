@@ -19,15 +19,13 @@ import RegisterPage from "@/modules/auth/pages/RegisterPage";
 
 import ClientLoginPage from "@/modules/auth/pages/ClientLoginPage";
 import ClientRegisterPage from "@/modules/auth/pages/ClientRegisterPage";
+import ForgotPasswordPage from "@/modules/auth/pages/ForgotPasswordPage";
 
 import OperatorLoginPage from "@/modules/auth/pages/OperatorLoginPage";
 
 /* Onboarding CLIENT */
 import OnboardingPage from "@/modules/onboarding/pages/OnboardingPage";
 import SuccessPage from "@/modules/onboarding/pages/SuccessPage";
-import OnboardingWizardPage from "@/modules/auth/pages/OnboardingWizardPage";
-import ProfileSuccessPage from "@/modules/auth/pages/ProfileSuccessPage";
-import OnboardingGuard from "@/components/OnboardingGuard";
 
 /* Dashboard Client */
 import ClientHomePage from "@/modules/dashboard/pages/ClientHomePage";
@@ -80,29 +78,27 @@ const AppRoutes = () => {
       {/* CLIENT AUTH */}
       <Route path="/login/client" element={<ClientLoginPage />} />
       <Route path="/register/client" element={<ClientRegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
       {/* OPERATOR AUTH */}
       <Route path="/login/operator" element={<OperatorLoginPage />} />
 
       {/* CLIENT ONBOARDING */}
-      <Route path="/onboarding" element={<OnboardingPage />} />
-      <Route path="/onboarding/success" element={<SuccessPage />} />
-
       <Route
-        path="/onboarding/profile"
+        path="/onboarding"
         element={
-          <OnboardingGuard>
-            <OnboardingWizardPage />
-          </OnboardingGuard>
+          <ProtectedRoute allowedRoles={["client"]}>
+            <OnboardingPage />
+          </ProtectedRoute>
         }
       />
 
       <Route
-        path="/onboarding/profile/success"
+        path="/onboarding/success"
         element={
-          <OnboardingGuard>
-            <ProfileSuccessPage />
-          </OnboardingGuard>
+          <ProtectedRoute allowedRoles={["client"]}>
+            <SuccessPage />
+          </ProtectedRoute>
         }
       />
 
