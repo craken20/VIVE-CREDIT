@@ -65,6 +65,7 @@ import RequestLoanPage from "@/modules/applications/pages/RequestLoanPage";
 import AdminLoginPage from "@/modules/auth/pages/AdminLoginPage";
 import { ApplicationsContextProvider } from "@/modules/operator-dashboard/hooks/ApplicationsContext";
 import FormScorecardClient from "@/modules/scoring/pages/FormScorecardClient";
+import CollectionsDashboard from "@/modules/operator-dashboard/submodules/collections/components/CollectionsDashboard";
 
 const AppRoutes = () => {
   return (
@@ -272,6 +273,8 @@ const AppRoutes = () => {
         <Route path='policy-engine' element={<PolicyEnginePage />} />
         <Route path='decision-engine' element={<DecisionPage />} />
         <Route path='scorecard' element={<ScorecardEngine />} />
+           <Route path='collections' element={<CollectionsDashboard/>} />
+
       </Route>
 
       {/* ENGINES */}
