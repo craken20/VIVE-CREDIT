@@ -1,9 +1,8 @@
 import { FiX, FiDownload, FiPrinter, FiUser } from "react-icons/fi";
-import type { CollectionCase } from "../types";
 import jsPDF from 'jspdf';
 
 interface Props {
-  selectedCase: CollectionCase | null;
+  selectedCase: any;
   open: boolean;
   onClose: () => void;
 }

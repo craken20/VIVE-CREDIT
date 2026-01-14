@@ -2,71 +2,46 @@ import React, { useState } from 'react';
 import CasesTable from '../components/CasesTable';
 import CaseViewModal from '../components/CaseViewModal';
 import DocsModal from '../components/DocsModal';
-
-// Mock data pentru 36 clienți (3 pagini x 12 clienți)
-const generateMockCases = () => {
-  const statuses = ['În întârziere', 'PTP activ', 'PTP rupt', 'Închis'];
-  const agents = ['Agent 1', 'Agent 2', 'Agent 3', 'Agent 4'];
-  const cases = [];
-
-  for (let i = 1; i <= 36; i++) {
-    cases.push({
-      id: i,
-      clientName: `Client ${i}`,
-      client: {
-        name: `Client ${i}`,
-        cnp: `${1990000000000 + i}`,
-        phone: `0${700000000 + i}`,
-        email: `client${i}@example.com`,
-        address: `Strada Exemplu ${i}, București`,
-      },
-      phone: `0${700000000 + i}`,
-      amount: Math.floor(Math.random() * 10000) + 1000,
-      daysOverdue: Math.floor(Math.random() * 90),
-      status: statuses[Math.floor(Math.random() * statuses.length)],
-      agent: agents[Math.floor(Math.random() * agents.length)],
-      lastContact: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString('ro-RO'),
-      cnp: `${1990000000000 + i}`,
-      address: `Strada Exemplu ${i}, București`,
-      email: `client${i}@example.com`,
-      contractNumber: `CNT-${10000 + i}`,
-      ptpActive: Math.random() > 0.5,
-      ptpDate: new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString('ro-RO'),
-      ptpAmount: Math.floor(Math.random() * 5000) + 500,
-    });
-  }
-
-  return cases;
-};
+import ReminderModal from '../components/ReminderModal';
+import { mockDB } from '../../../data/mockDB';
 
 const CollectionsDashboard: React.FC = () => {
-  const [allCases] = useState(generateMockCases());
+  const transformMockToCollections = () => {
+    return mockDB.map((app, index) => ({
+      id: `CL-${index + 1}`,
+      client: app.client,
+      amount: app.creditAmount,
+      daysLate: Math.floor(Math.random() * 90),
+      status: app.status === 'approved' ? 'Închis' : 
+              app.status === 'rejected' ? 'PTP rupt' :
+              app.status === 'manual_review' ? 'În întârziere' : 
+              'PTP activ',
+      agent: `Agent ${Math.floor(Math.random() * 4) + 1}`,
+    }));
+  };
+
+  const [allCases] = useState(transformMockToCollections());
   const [filteredCases, setFilteredCases] = useState(allCases);
   
-  // Filtre
   const [clientFilter, setClientFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [agentFilter, setAgentFilter] = useState('');
+  const [daysLateFilter, setDaysLateFilter] = useState('');
   
-  // Paginare
   const [currentPage, setCurrentPage] = useState(1);
-  const casesPerPage = 12;
+  const casesPerPage = 8;
 
-  
-  
-  // Modale
   const [selectedCase, setSelectedCase] = useState<any>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDocsModalOpen, setIsDocsModalOpen] = useState(false);
+  const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
 
-  // Aplicare filtre
   React.useEffect(() => {
     let filtered = allCases;
 
     if (clientFilter) {
       filtered = filtered.filter(c => 
-        c.clientName.toLowerCase().includes(clientFilter.toLowerCase()) ||
-        c.phone.includes(clientFilter)
+        c.client.toLowerCase().includes(clientFilter.toLowerCase())
       );
     }
 
@@ -78,17 +53,25 @@ const CollectionsDashboard: React.FC = () => {
       filtered = filtered.filter(c => c.agent === agentFilter);
     }
 
-    setFilteredCases(filtered);
-    setCurrentPage(1); // Reset la prima pagină când se schimbă filtrele
-  }, [clientFilter, statusFilter, agentFilter, allCases]);
+    if (daysLateFilter) {
+      if (daysLateFilter === '0-30') {
+        filtered = filtered.filter(c => c.daysLate >= 0 && c.daysLate <= 30);
+      } else if (daysLateFilter === '31-60') {
+        filtered = filtered.filter(c => c.daysLate >= 31 && c.daysLate <= 60);
+      } else if (daysLateFilter === '60+') {
+        filtered = filtered.filter(c => c.daysLate > 60);
+      }
+    }
 
-  // Paginare
+    setFilteredCases(filtered);
+    setCurrentPage(1);
+  }, [clientFilter, statusFilter, agentFilter, daysLateFilter, allCases]);
+
   const indexOfLastCase = currentPage * casesPerPage;
   const indexOfFirstCase = indexOfLastCase - casesPerPage;
   const currentCases = filteredCases.slice(indexOfFirstCase, indexOfLastCase);
   const totalPages = Math.ceil(filteredCases.length / casesPerPage);
 
-  // Handlers
   const handleViewCase = (caseData: any) => {
     setSelectedCase(caseData);
     setIsViewModalOpen(true);
@@ -99,23 +82,15 @@ const CollectionsDashboard: React.FC = () => {
     setIsDocsModalOpen(true);
   };
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+  const handleOpenReminder = (caseData: any) => {
+    setSelectedCase(caseData);
+    setIsReminderModalOpen(true);
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 p-6">
-      {/* Header */}
+    <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
           Collections Dashboard
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">
@@ -123,10 +98,8 @@ const CollectionsDashboard: React.FC = () => {
         </p>
       </div>
 
-      {/* Filtre */}
-      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg mb-6 border border-gray-200 dark:border-gray-700">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Filtru Client */}
+      <div className="mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Caută Client / Telefon
@@ -142,7 +115,24 @@ const CollectionsDashboard: React.FC = () => {
             />
           </div>
 
-          {/* Filtru Stare */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Zile Întârziere
+            </label>
+            <select
+              value={daysLateFilter}
+              onChange={(e) => setDaysLateFilter(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
+                       bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                       focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Toate perioadele</option>
+              <option value="0-30"> 0-30 zile</option>
+              <option value="31-60"> 31-60 zile</option>
+              <option value="60+"> 60+ zile</option>
+            </select>
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Stare
@@ -162,7 +152,6 @@ const CollectionsDashboard: React.FC = () => {
             </select>
           </div>
 
-          {/* Filtru Agent */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Agent
@@ -184,51 +173,52 @@ const CollectionsDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Tabel */}
+      <div className="mt-4 mb-6">
+        <button
+          onClick={() => {
+            setClientFilter('');
+            setStatusFilter('');
+            setAgentFilter('');
+            setDaysLateFilter('');
+            setCurrentPage(1);
+          }}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+        >
+          Resetează filtre
+        </button>
+      </div>
+
       <CasesTable
-        data={currentCases as any}
+        data={currentCases}
         onView={handleViewCase}
         onDocs={handleOpenDocs}
+        onReminder={handleOpenReminder}
       />
 
       {/* Paginare */}
-      <div className="mt-6 flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-        <div className="text-sm text-gray-700 dark:text-gray-300">
-          Afișare {indexOfFirstCase + 1} - {Math.min(indexOfLastCase, filteredCases.length)} din {filteredCases.length} cazuri
-        </div>
-        
-        <div className="flex gap-2">
+
+       {totalPages > 1 && (
+        <div className="flex justify-center gap-3 p-4">
           <button
-            onClick={handlePrevPage}
             disabled={currentPage === 1}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors
-              ${currentPage === 1
-                ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-              }`}
+            onClick={() => setCurrentPage(currentPage - 1)}
+            className="px-3 py-1 text-sm bg-blue-500 text-white rounded-lg disabled:opacity-40"
           >
-            Previous
+            Prev
           </button>
-          
-          <div className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white">
-            Pagina {currentPage} din {totalPages}
-          </div>
-          
+
           <button
-            onClick={handleNextPage}
             disabled={currentPage === totalPages}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors
-              ${currentPage === totalPages
-                ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-              }`}
+            onClick={() => setCurrentPage(currentPage + 1)}
+            className="px-3 py-1 text-sm bg-blue-500 text-white rounded-lg disabled:opacity-40"
           >
             Next
           </button>
         </div>
-      </div>
+      )}
 
-      {/* Modale */}
+
+
       {selectedCase && (
         <>
           <CaseViewModal
@@ -240,6 +230,12 @@ const CollectionsDashboard: React.FC = () => {
           <DocsModal
             open={isDocsModalOpen}
             onClose={() => setIsDocsModalOpen(false)}
+            selectedCase={selectedCase}
+          />
+
+          <ReminderModal
+            open={isReminderModalOpen}
+            onClose={() => setIsReminderModalOpen(false)}
             selectedCase={selectedCase}
           />
         </>

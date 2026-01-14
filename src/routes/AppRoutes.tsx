@@ -273,7 +273,7 @@ const AppRoutes = () => {
         <Route path='policy-engine' element={<PolicyEnginePage />} />
         <Route path='decision-engine' element={<DecisionPage />} />
         <Route path='scorecard' element={<ScorecardEngine />} />
-           <Route path='collections' element={<CollectionsDashboard/>} />
+        <Route path='collections' element={<CollectionsDashboard />} />
 
       </Route>
 
